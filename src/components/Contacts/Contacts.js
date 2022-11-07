@@ -1,18 +1,23 @@
-import { useState } from 'react';
+import { deleteContact } from '../../redux/contactsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFilter } from '../../redux/filterSlice';
 import { Label } from 'components/Form/Form.styled';
 import { FindContact, DeleteBtn, Contact } from './Contacts.styled';
-import PropTypes from 'prop-types';
 
-export const ContactList = ({ contacts, handleDelete }) => {
-    const [filter, setFilter] = useState('')
-
-    const handleFilterChange = ({ target: { value } }) => {
-        setFilter(value);
+export const ContactList = () => {
+    const dispatch = useDispatch();
+    const contacts = useSelector(state => state.contacts);
+    const filter = useSelector(state => state.filter);
+    const handleFilterChange = e => {
+        dispatch(setFilter(e.target.value));
     };
-    const normalizedFilter = filter.toLowerCase();
-    const filtredList = contacts.filter(item =>
-        item.name.toLowerCase().includes(normalizedFilter)
+
+    const normalisedFilter = filter.toLowerCase();
+    const filteredList = contacts.filter(({ name }) =>
+        name.toLowerCase().includes(normalisedFilter)
     );
+
+
     return (
         <FindContact>
             <Label>
@@ -20,16 +25,15 @@ export const ContactList = ({ contacts, handleDelete }) => {
                 <input
                     type="text"
                     name="filter"
-                    value={filter}
                     onChange={handleFilterChange}
                 />
             </Label>
             <ul>
-                {contacts.length !== 0
-                    ? filtredList.map(({ id, name, number }) => (
+                {filteredList.length !== 0
+                    ? filteredList.map(({ id, name, number }) => (
                         <Contact key={id}>
                             {name}: {number}
-                            <DeleteBtn type="button" onClick={() => handleDelete(name)}>
+                            <DeleteBtn type="button" onClick={() => dispatch(deleteContact(name))}>
                                 Delete
                             </DeleteBtn>
                         </Contact>
@@ -39,57 +43,3 @@ export const ContactList = ({ contacts, handleDelete }) => {
         </FindContact>
     );
 }
-
-
-
-// export class Contacts extends Component {
-//     state = {
-//         filter: '',
-//     };
-
-// handleFilterChange = ({ target: { value } }) => {
-//     this.setState({ filter: value });
-// };
-
-// render() {
-//     const { contacts, handleDelete } = this.props;
-//     const { filter } = this.state;
-//     const normalizedFilter = filter.toLowerCase();
-
-//     const filtredList = contacts.filter(item =>
-//         item.name.toLowerCase().includes(normalizedFilter)
-//     );
-//     return (
-//         <FindContact>
-//             <Label>
-//                 Find contacts by name
-//                 <input
-//                     type="text"
-//                     name="filter"
-//                     value={filter}
-//                     onChange={this.handleFilterChange}
-//                 />
-//             </Label>
-//             <ul>
-//                 {contacts.length !== 0
-//                     ? filtredList.map(({ id, name, number }) => (
-//                         <Contact key={id}>
-//                             {name}: {number}
-//                             <DeleteBtn type="button" onClick={() => handleDelete(name)}>
-//                                 Delete
-//                             </DeleteBtn>
-//                         </Contact>
-//                     ))
-// : ''}
-// </ul>
-// </FindContact>
-// );
-//     }
-// }
-
-ContactList.propTypes = {
-    contacts: PropTypes.arrayOf(
-        PropTypes.objectOf(PropTypes.string.isRequired).isRequired
-    ).isRequired,
-    handleDelete: PropTypes.func.isRequired,
-};

@@ -1,9 +1,29 @@
 import { Formik } from 'formik';
 import { FormStyles, Label, SubmitBtn } from './Form.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
 
-import PropTypes from 'prop-types';
 
-export const Form = ({ handleSubmit }) => {
+const checkContacts = (contacts, newUser) => {
+    const normalizedName = newUser.toLowerCase();
+    return !contacts.find(user => user.name.toLowerCase() === normalizedName);
+};
+
+export const Form = () => {
+    const dispatch = useDispatch();
+    const contacts = useSelector(state => state.contacts);
+
+    const handleSubmit = ({ name, number }, action) => {
+        if (!checkContacts(contacts, name)) {
+            alert(`${name} is already is contacts`);
+            action.resetForm();
+            return;
+        }
+        dispatch(addContact(name, number));
+        action.resetForm();
+    };
+
+
     return (
         <Formik initialValues={{ name: '', number: '' }} onSubmit={handleSubmit}>
             {({ values, handleChange }) => (
@@ -39,8 +59,4 @@ export const Form = ({ handleSubmit }) => {
             )}
         </Formik>
     );
-};
-
-Form.propTypes = {
-    handleSubmit: PropTypes.func.isRequired,
 };
