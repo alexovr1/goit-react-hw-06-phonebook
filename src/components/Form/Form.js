@@ -4,20 +4,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from '../../redux/contactsSlice';
 
 
-const checkContacts = (contacts, newUser) => {
-    const normalizedName = newUser.toLowerCase();
-    return !contacts.find(user => user.name.toLowerCase() === normalizedName);
-};
-
 export const Form = () => {
     const dispatch = useDispatch();
     const contacts = useSelector(state => state.contacts);
 
     const handleSubmit = ({ name, number }, action) => {
-        if (!checkContacts(contacts, name)) {
-            alert(`${name} is already is contacts`);
-            action.resetForm();
-            return;
+        if (
+            contacts
+                .map(({ name }) => name.toLocaleLowerCase())
+                .some(name => name === name.toLocaleLowerCase())
+        ) {
+            return alert(`${name} is already in contacts`);
         }
         dispatch(addContact(name, number));
         action.resetForm();
