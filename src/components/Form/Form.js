@@ -10,17 +10,13 @@ export const Form = () => {
 
     const handleSubmit = ({ name, number }, action) => {
         if (
-            contacts
-                .map(({ name }) => name.toLocaleLowerCase())
-                .some(name => name === name.toLocaleLowerCase())
+            contacts.find(user => user.name.toLowerCase() === name.toLowerCase())
         ) {
             return alert(`${name} is already in contacts`);
         }
         dispatch(addContact(name, number));
         action.resetForm();
     };
-
-
     return (
         <Formik initialValues={{ name: '', number: '' }} onSubmit={handleSubmit}>
             {({ values, handleChange }) => (
